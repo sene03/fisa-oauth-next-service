@@ -1,6 +1,7 @@
-import NextAuth from "next-auth"
+import NextAuth from "next-auth";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  debug: true,
   providers: [
     {
       id: "fisa",
@@ -15,29 +16,29 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         },
       },
       token: "http://localhost:9000/oauth2/token",
-      userinfo: "http://localhost:9000/userinfo",
-      clientId: process.env.AUTH_CLIENT_ID,
-      clientSecret: process.env.AUTH_CLIENT_SECRET,
+      userinfo: "http://localhost:8080/userinfo",
+      clientId: process.env.AUTH_FISA_ID,
+      clientSecret: process.env.AUTH_FISA_SECRET,
       checks: ["pkce", "state"],
     },
   ],
   callbacks: {
     async jwt({ token, account, profile }) {
       if (account) {
-        token.accessToken = account.access_token  // Resource Server 호출용
-        token.role = (profile as any)?.role
-        token.id = (profile as any)?.sub
+        token.accessToken = account.access_token; // Resource Server 호출용
+        token.role = (profile as any)?.role;
+        token.id = (profile as any)?.sub;
       }
-      return token
+      return token;
     },
     async session({ session, token }) {
-      session.accessToken = token.accessToken as string
-      session.user.id = token.id as string
-      session.user.role = token.role as string
-      return session
+      session.accessToken = token.accessToken as string;
+      session.user.id = token.id as string;
+      session.user.role = token.role as string;
+      return session;
     },
   },
   pages: {
     signIn: "/login",
   },
-})
+});
