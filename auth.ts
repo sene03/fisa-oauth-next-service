@@ -23,10 +23,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     async jwt({ token, account, profile }) {
-      if (account) {
+      if (account && profile) {
+        console.log("9000번 서버가 보내준 전체 프로필:", profile);
         token.accessToken = account.access_token  // Resource Server 호출용
-        token.role = (profile as any)?.role
-        token.id = (profile as any)?.sub
+        token.role = (profile as any)?.role   // 9000번이 준 role
+        token.name = (profile as any)?.name   // 9000번이 준 name
+        token.email = (profile as any)?.email // 9000번이 준 email
       }
       return token
     },
@@ -34,6 +36,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.accessToken = token.accessToken as string
       session.user.id = token.id as string
       session.user.role = token.role as string
+      session.user.email = token.email as string
       return session
     },
   },
